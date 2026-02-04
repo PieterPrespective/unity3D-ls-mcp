@@ -53,7 +53,10 @@
       "mcp__unityMCP__manage_editor",
       "Bash(timeout /t 2 /nobreak)",
       "mcp__pskd__DoltPush",
-      "WebSearch"
+      "WebSearch",
+      "mcp__psdd__RepositoryStatus",
+      "mcp__pskd__RepositoryStatus",
+      "mcp__psdd__UpdateManifest"
     ]
   },
   "enableAllProjectMcpServers": true,
