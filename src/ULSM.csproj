@@ -14,9 +14,14 @@
     <PackageId>ulsm</PackageId>
     <Version>1.0.0</Version>
     <Authors>Prespective</Authors>
-    <Description>Unity Language Server MCP - Roslyn-based code analysis for Unity 6.x projects via Model Context Protocol. Provides semantic analysis, diagnostics, refactoring, and Unity-specific pattern checking.</Description>
-    <PackageTags>mcp;roslyn;unity;unity3d;csharp;code-analysis;language-server;claude-code;model-context-protocol</PackageTags>
+    <Company>Prespective</Company>
+    <Product>ULSM</Product>
+    <Description>Unity Language Server MCP - Roslyn-based code analysis for Unity 6.x projects via Model Context Protocol. Includes Unity-specific diagnostics, anti-pattern detection, and API migration checking. 22+ tools for semantic analysis, refactoring, and code navigation.</Description>
+    <Copyright>Copyright (c) 2026 Prespective. Based on dotnet-roslyn-mcp by Brendan Kowitz.</Copyright>
+    <PackageTags>mcp;roslyn;unity;unity3d;csharp;code-analysis;language-server;claude-code;model-context-protocol;ai;code-review</PackageTags>
+    <PackageProjectUrl>https://github.com/prespective/ulsm</PackageProjectUrl>
     <RepositoryUrl>https://github.com/prespective/ulsm</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
