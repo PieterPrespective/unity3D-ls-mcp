@@ -31,6 +31,13 @@ public class RoslynService
             ? timeout : 30;
     }
 
+    /// <summary>
+    /// Gets the currently loaded solution.
+    /// Used by UnityAnalysisService for analysis operations.
+    /// </summary>
+    /// <returns>The loaded Solution, or null if none loaded.</returns>
+    public Solution? GetSolution() => _solution;
+
     // Helper method for glob pattern matching (supports * and ? wildcards)
     private static bool MatchesGlobPattern(string input, string pattern)
     {
