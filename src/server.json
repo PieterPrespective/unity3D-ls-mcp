@@ -51,6 +51,18 @@
     "ULSM_TIMEOUT_SECONDS": {
       "description": "Timeout for analysis operations",
       "default": "30"
+    },
+    "ULSM_FRAMEWORK_PATH": {
+      "description": "Override path to .NET Framework reference assemblies (for Unity project loading). Unity targets .NET Framework 4.7.1, so this should point to a directory containing mscorlib.dll and related BCL assemblies.",
+      "required": false
+    },
+    "ULSM_FORCE_ADHOC": {
+      "description": "Force AdhocWorkspace instead of MSBuildWorkspace for Unity projects. Set to 'true' to bypass MSBuild and parse .csproj files directly.",
+      "default": "false"
+    },
+    "UNITY_EDITOR_PATH": {
+      "description": "Path to Unity Editor installation (used for reference resolution when HintPaths are relative or need remapping)",
+      "required": false
     }
   }
 }

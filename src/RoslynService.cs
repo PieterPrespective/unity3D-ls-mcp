@@ -5,18 +5,23 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.FindSymbols;
 using Microsoft.CodeAnalysis.MSBuild;
+using ULSM.Unity;
 
 namespace ULSM;
 
 public class RoslynService
 {
     private MSBuildWorkspace? _workspace;
+    private Workspace? _workspaceBase; // For AdhocWorkspace fallback
     private Solution? _solution;
     private readonly Dictionary<string, Document> _documentCache = new();
     private readonly int _maxDiagnostics;
     private readonly int _timeoutSeconds;
 
     private DateTime? _solutionLoadedAt;
+    private bool _isUnityProject;
+    private string? _unityVersion;
+    private bool _usedFallbackWorkspace;
 
     public RoslynService()
     {
@@ -42,6 +47,13 @@ public class RoslynService
         return System.Text.RegularExpressions.Regex.IsMatch(input, regexPattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
     }
 
+    /// <summary>
+    /// Loads a .NET solution for analysis. Automatically detects Unity projects and
+    /// configures the workspace appropriately with Unity-specific MSBuild properties.
+    /// Falls back to AdhocWorkspace if MSBuildWorkspace fails for Unity projects.
+    /// </summary>
+    /// <param name="solutionPath">Absolute path to the .sln file.</param>
+    /// <returns>Solution loading result with project and document counts.</returns>
     public async Task<object> LoadSolutionAsync(string solutionPath)
     {
         if (!File.Exists(solutionPath))
@@ -49,17 +61,63 @@ public class RoslynService
             throw new FileNotFoundException($"Solution file not found: {solutionPath}");
         }
 
-        // Dispose existing workspace
+        // Dispose existing workspaces
         _workspace?.Dispose();
+        _workspaceBase?.Dispose();
+        _workspace = null;
+        _workspaceBase = null;
         _documentCache.Clear();
 
-        _workspace = MSBuildWorkspace.Create();
-        _workspace.WorkspaceFailed += (sender, args) =>
-        {
-            Console.Error.WriteLine($"[ULSM Warning] Workspace: {args.Diagnostic.Message}");
-        };
+        // Reset Unity-specific state
+        _isUnityProject = false;
+        _unityVersion = null;
+        _usedFallbackWorkspace = false;
 
-        _solution = await _workspace.OpenSolutionAsync(solutionPath);
+        // Detect Unity project
+        _isUnityProject = UnityProjectDetector.IsUnityProject(solutionPath);
+
+        if (_isUnityProject)
+        {
+            var solutionDir = Path.GetDirectoryName(solutionPath);
+            _unityVersion = solutionDir != null ? UnityProjectDetector.GetUnityVersion(solutionDir) : null;
+
+            Console.Error.WriteLine($"[ULSM] Detected Unity project" +
+                (_unityVersion != null ? $" (Unity {_unityVersion})" : ""));
+
+            var (workspace, solution, usedFallback) = await UnityWorkspaceLoader.LoadSolutionAsync(
+                solutionPath,
+                args =>
+                {
+                    if (args.Diagnostic.Kind == WorkspaceDiagnosticKind.Warning)
+                        Console.Error.WriteLine($"[ULSM Warning] Workspace: {args.Diagnostic.Message}");
+                });
+
+            _usedFallbackWorkspace = usedFallback;
+
+            if (workspace is MSBuildWorkspace msbuildWorkspace)
+            {
+                _workspace = msbuildWorkspace;
+            }
+            else
+            {
+                _workspaceBase = workspace;
+            }
+
+            _solution = solution;
+        }
+        else
+        {
+            // Standard .NET project loading (existing behavior)
+            _workspace = MSBuildWorkspace.Create();
+            _workspace.SkipUnrecognizedProjects = true;
+            _workspace.WorkspaceFailed += (sender, args) =>
+            {
+                Console.Error.WriteLine($"[ULSM Warning] Workspace: {args.Diagnostic.Message}");
+            };
+
+            _solution = await _workspace.OpenSolutionAsync(solutionPath);
+        }
+
         _solutionLoadedAt = DateTime.UtcNow;
 
         var projectCount = _solution.ProjectIds.Count;
@@ -68,9 +126,13 @@ public class RoslynService
         return new
         {
             success = true,
-            solutionPath,
+            solutionPath = _solution.FilePath,
             projectCount,
-            documentCount
+            documentCount,
+            isUnityProject = _isUnityProject,
+            unityVersion = _unityVersion,
+            usedFallback = _usedFallbackWorkspace,
+            loadedAt = _solutionLoadedAt?.ToString("yyyy-MM-ddTHH:mm:ssZ")
         };
     }
 
@@ -124,12 +186,16 @@ public class RoslynService
                 documents = documentCount,
                 loadedAt = _solutionLoadedAt?.ToString("yyyy-MM-ddTHH:mm:ssZ"),
                 errors = errorCount,
-                warnings = warningCount
+                warnings = warningCount,
+                isUnityProject = _isUnityProject,
+                unityVersion = _unityVersion
             },
             workspace = new
             {
                 indexed = true,
-                cacheSize = _documentCache.Count
+                cacheSize = _documentCache.Count,
+                usedFallback = _usedFallbackWorkspace,
+                frameworkPath = UnityWorkspaceLoader.FindFrameworkPath()
             },
             capabilities = new
             {
