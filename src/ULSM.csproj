@@ -5,20 +5,20 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <RootNamespace>ULSM</RootNamespace>
+    <AssemblyName>ULSM</AssemblyName>
 
     <!-- Global Tool Configuration -->
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>dotnet-roslyn-mcp</ToolCommandName>
-    <PackageId>dotnet-roslyn-mcp</PackageId>
+    <ToolCommandName>ulsm</ToolCommandName>
+    <PackageId>ulsm</PackageId>
     <Version>1.0.0</Version>
-    <Authors>Brendan Kowitz</Authors>
-    <Description>A .NET-based Model Context Protocol (MCP) server providing 24+ essential tools for .NET/C# code analysis, navigation, refactoring, diagnostics, automated code fixes, and batch operations using Roslyn.</Description>
-    <PackageTags>mcp;roslyn;csharp;semantic-analysis;refactoring;claude-code;model-context-protocol;claude;ai</PackageTags>
-    <RepositoryUrl>https://github.com/brendankowitz/vs-ide-mcp</RepositoryUrl>
+    <Authors>Prespective</Authors>
+    <Description>Unity Language Server MCP - Roslyn-based code analysis for Unity 6.x projects via Model Context Protocol. Provides semantic analysis, diagnostics, refactoring, and Unity-specific pattern checking.</Description>
+    <PackageTags>mcp;roslyn;unity;unity3d;csharp;code-analysis;language-server;claude-code;model-context-protocol</PackageTags>
+    <RepositoryUrl>https://github.com/prespective/ulsm</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <ContainerImageName>mcr.microsoft.com/dotnet/runtime</ContainerImageName>
-    <ContainerImageTag>8.0</ContainerImageTag>
   </PropertyGroup>
 
   <ItemGroup>

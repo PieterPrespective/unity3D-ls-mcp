@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace RoslynMcp;
+namespace ULSM;
 
 public class McpServer
 {
@@ -20,7 +20,7 @@ public class McpServer
 
     public async Task RunAsync()
     {
-        await LogAsync("Information", "Roslyn MCP Server starting...");
+        await LogAsync("Information", "ULSM (Unity Language Server MCP) starting...");
 
         // Auto-load solution from environment variable
         var solutionPath = Environment.GetEnvironmentVariable("DOTNET_SOLUTION_PATH");
@@ -130,7 +130,7 @@ public class McpServer
             },
             serverInfo = new
             {
-                name = "Roslyn MCP Server",
+                name = "ULSM - Unity Language Server MCP",
                 version = "1.0.0"
             }
         });
@@ -143,7 +143,7 @@ public class McpServer
         {
             (object)new
             {
-                name = "roslyn:health_check",
+                name = "ulsm:health_check",
                 description = "Check the health and status of the Roslyn MCP server and workspace",
                 inputSchema = new
                 {
@@ -153,7 +153,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:load_solution",
+                name = "ulsm:load_solution",
                 description = "Load a .NET solution for analysis. Returns success=true with projectCount and documentCount.",
                 inputSchema = new
                 {
@@ -167,7 +167,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:get_symbol_info",
+                name = "ulsm:get_symbol_info",
                 description = "Get detailed semantic information about a symbol at a specific position. IMPORTANT: Uses ZERO-BASED coordinates. If your editor shows 'Line 14, Column 5', pass line=13, column=4. Returns symbol kind, type, namespace, documentation, and location.",
                 inputSchema = new
                 {
@@ -183,7 +183,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:go_to_definition",
+                name = "ulsm:go_to_definition",
                 description = "Fast navigation to symbol definition. Returns the definition location without finding all references. IMPORTANT: Uses ZERO-BASED coordinates (editor line 10 = pass line 9).",
                 inputSchema = new
                 {
@@ -199,7 +199,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:find_references",
+                name = "ulsm:find_references",
                 description = "Find all references to a symbol across the entire solution. Returns file paths, line numbers, and code context for each reference. IMPORTANT: Uses ZERO-BASED coordinates (editor line 10 = pass line 9).",
                 inputSchema = new
                 {
@@ -216,7 +216,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:find_implementations",
+                name = "ulsm:find_implementations",
                 description = "Find all implementations of an interface or abstract class",
                 inputSchema = new
                 {
@@ -233,7 +233,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:get_type_hierarchy",
+                name = "ulsm:get_type_hierarchy",
                 description = "Get the inheritance hierarchy (base types and derived types) for a type",
                 inputSchema = new
                 {
@@ -250,7 +250,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:search_symbols",
+                name = "ulsm:search_symbols",
                 description = "Search for types, methods, properties, etc. by name across the solution. Supports glob patterns (e.g., '*Handler' finds classes ending with 'Handler', 'Get*' finds symbols starting with 'Get'). Use ? for single character wildcard. PAGINATION: Returns totalCount and hasMore. Use offset to paginate through results.",
                 inputSchema = new
                 {
@@ -268,7 +268,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:semantic_query",
+                name = "ulsm:semantic_query",
                 description = "Advanced semantic code query with multiple filters. Find symbols based on their semantic properties: async methods without CancellationToken, classes with specific attributes, fields/properties of specific types, etc. Returns detailed symbol information with statistics.",
                 inputSchema = new
                 {
@@ -292,7 +292,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:get_diagnostics",
+                name = "ulsm:get_diagnostics",
                 description = "Get compiler errors, warnings, and info messages for a file or entire project",
                 inputSchema = new
                 {
@@ -308,7 +308,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:get_code_fixes",
+                name = "ulsm:get_code_fixes",
                 description = "Get available code fixes for a specific diagnostic",
                 inputSchema = new
                 {
@@ -325,7 +325,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:apply_code_fix",
+                name = "ulsm:apply_code_fix",
                 description = "Apply automated code fix for a diagnostic. WORKFLOW: (1) Call with no fixIndex to list available fixes, (2) Call with fixIndex and preview=true to preview changes, (3) Call with preview=false to apply. IMPORTANT: Uses ZERO-BASED coordinates.",
                 inputSchema = new
                 {
@@ -344,7 +344,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:get_project_structure",
+                name = "ulsm:get_project_structure",
                 description = "Get solution/project structure. IMPORTANT: For large solutions (100+ projects), use summaryOnly=true or projectNamePattern to avoid token limit errors. Maximum output is limited to 25,000 tokens.",
                 inputSchema = new
                 {
@@ -361,7 +361,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:organize_usings",
+                name = "ulsm:organize_usings",
                 description = "Sort and remove unused using directives in a file",
                 inputSchema = new
                 {
@@ -375,7 +375,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:organize_usings_batch",
+                name = "ulsm:organize_usings_batch",
                 description = "Organize using directives for multiple files in a project. Supports file pattern filtering (e.g., '*.cs', 'Services/*.cs'). PREVIEW mode by default - set preview=false to apply changes.",
                 inputSchema = new
                 {
@@ -391,7 +391,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:format_document_batch",
+                name = "ulsm:format_document_batch",
                 description = "Format multiple documents in a project using Roslyn's NormalizeWhitespace. Ensures consistent indentation, spacing, and line breaks. PREVIEW mode by default - set preview=false to apply changes.",
                 inputSchema = new
                 {
@@ -407,7 +407,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:get_method_overloads",
+                name = "ulsm:get_method_overloads",
                 description = "Get all overloads of a method",
                 inputSchema = new
                 {
@@ -423,7 +423,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:get_containing_member",
+                name = "ulsm:get_containing_member",
                 description = "Get information about the containing method/property/class at a position",
                 inputSchema = new
                 {
@@ -439,7 +439,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:find_callers",
+                name = "ulsm:find_callers",
                 description = "Find all methods/properties that call or reference a specific symbol (inverse of find_references). Essential for impact analysis: 'If I change this method, what code will be affected?' IMPORTANT: Uses ZERO-BASED coordinates.",
                 inputSchema = new
                 {
@@ -456,7 +456,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:find_unused_code",
+                name = "ulsm:find_unused_code",
                 description = "Find unused types, methods, properties, and fields in a project or entire solution. Returns symbols with zero references (excluding their declaration). Default limit: 50 results. Use maxResults to see more.",
                 inputSchema = new
                 {
@@ -473,7 +473,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:rename_symbol",
+                name = "ulsm:rename_symbol",
                 description = "Safely rename a symbol (type, method, property, etc.) across the entire solution. Uses Roslyn's semantic analysis to ensure all references are updated. SUPPORTS PREVIEW MODE - always preview first! IMPORTANT: Uses ZERO-BASED coordinates. Default shows first 20 files with summary verbosity.",
                 inputSchema = new
                 {
@@ -493,7 +493,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:extract_interface",
+                name = "ulsm:extract_interface",
                 description = "Generate an interface from a class or struct. Extracts all public instance members (methods, properties, events). Useful for dependency injection and testability. IMPORTANT: Uses ZERO-BASED coordinates.",
                 inputSchema = new
                 {
@@ -511,7 +511,7 @@ public class McpServer
             },
             (object)new
             {
-                name = "roslyn:dependency_graph",
+                name = "ulsm:dependency_graph",
                 description = "Visualize project dependencies as a graph. Shows which projects reference which, detects circular dependencies. Can output as Mermaid diagram for visualization.",
                 inputSchema = new
                 {
@@ -541,47 +541,47 @@ public class McpServer
 
             var result = name switch
             {
-                "roslyn:health_check" => await _roslynService.GetHealthCheckAsync(),
+                "ulsm:health_check" => await _roslynService.GetHealthCheckAsync(),
 
-                "roslyn:load_solution" => await _roslynService.LoadSolutionAsync(
+                "ulsm:load_solution" => await _roslynService.LoadSolutionAsync(
                     arguments?["solutionPath"]?.GetValue<string>() ?? throw new Exception("solutionPath required")),
 
-                "roslyn:get_symbol_info" => await _roslynService.GetSymbolInfoAsync(
+                "ulsm:get_symbol_info" => await _roslynService.GetSymbolInfoAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
                     arguments?["line"]?.GetValue<int>() ?? throw new Exception("line required"),
                     arguments?["column"]?.GetValue<int>() ?? throw new Exception("column required")),
 
-                "roslyn:go_to_definition" => await _roslynService.GoToDefinitionAsync(
+                "ulsm:go_to_definition" => await _roslynService.GoToDefinitionAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
                     arguments?["line"]?.GetValue<int>() ?? throw new Exception("line required"),
                     arguments?["column"]?.GetValue<int>() ?? throw new Exception("column required")),
 
-                "roslyn:find_references" => await _roslynService.FindReferencesAsync(
+                "ulsm:find_references" => await _roslynService.FindReferencesAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
                     arguments?["line"]?.GetValue<int>() ?? throw new Exception("line required"),
                     arguments?["column"]?.GetValue<int>() ?? throw new Exception("column required"),
                     arguments?["maxResults"]?.GetValue<int>()),
 
-                "roslyn:find_implementations" => await _roslynService.FindImplementationsAsync(
+                "ulsm:find_implementations" => await _roslynService.FindImplementationsAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
                     arguments?["line"]?.GetValue<int>() ?? throw new Exception("line required"),
                     arguments?["column"]?.GetValue<int>() ?? throw new Exception("column required"),
                     arguments?["maxResults"]?.GetValue<int>()),
 
-                "roslyn:get_type_hierarchy" => await _roslynService.GetTypeHierarchyAsync(
+                "ulsm:get_type_hierarchy" => await _roslynService.GetTypeHierarchyAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
                     arguments?["line"]?.GetValue<int>() ?? throw new Exception("line required"),
                     arguments?["column"]?.GetValue<int>() ?? throw new Exception("column required"),
                     arguments?["maxDerivedTypes"]?.GetValue<int>()),
 
-                "roslyn:search_symbols" => await _roslynService.SearchSymbolsAsync(
+                "ulsm:search_symbols" => await _roslynService.SearchSymbolsAsync(
                     arguments?["query"]?.GetValue<string>() ?? throw new Exception("query required"),
                     arguments?["kind"]?.GetValue<string>(),
                     arguments?["maxResults"]?.GetValue<int>() ?? 50,
                     arguments?["namespaceFilter"]?.GetValue<string>(),
                     arguments?["offset"]?.GetValue<int>() ?? 0),
 
-                "roslyn:semantic_query" => await _roslynService.SemanticQueryAsync(
+                "ulsm:semantic_query" => await _roslynService.SemanticQueryAsync(
                     arguments?["kinds"]?.AsArray()?.Select(e => e?.GetValue<string>() ?? "").Where(s => !string.IsNullOrEmpty(s)).ToList(),
                     arguments?["isAsync"]?.GetValue<bool?>(),
                     arguments?["namespaceFilter"]?.GetValue<string>(),
@@ -594,19 +594,19 @@ public class McpServer
                     arguments?["parameterExcludes"]?.AsArray()?.Select(e => e?.GetValue<string>() ?? "").Where(s => !string.IsNullOrEmpty(s)).ToList(),
                     arguments?["maxResults"]?.GetValue<int>()),
 
-                "roslyn:get_diagnostics" => await _roslynService.GetDiagnosticsAsync(
+                "ulsm:get_diagnostics" => await _roslynService.GetDiagnosticsAsync(
                     arguments?["filePath"]?.GetValue<string>(),
                     arguments?["projectPath"]?.GetValue<string>(),
                     arguments?["severity"]?.GetValue<string>(),
                     arguments?["includeHidden"]?.GetValue<bool>() ?? false),
 
-                "roslyn:get_code_fixes" => await _roslynService.GetCodeFixesAsync(
+                "ulsm:get_code_fixes" => await _roslynService.GetCodeFixesAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
                     arguments?["diagnosticId"]?.GetValue<string>() ?? throw new Exception("diagnosticId required"),
                     arguments?["line"]?.GetValue<int>() ?? throw new Exception("line required"),
                     arguments?["column"]?.GetValue<int>() ?? throw new Exception("column required")),
 
-                "roslyn:apply_code_fix" => await _roslynService.ApplyCodeFixAsync(
+                "ulsm:apply_code_fix" => await _roslynService.ApplyCodeFixAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
                     arguments?["diagnosticId"]?.GetValue<string>() ?? throw new Exception("diagnosticId required"),
                     arguments?["line"]?.GetValue<int>() ?? throw new Exception("line required"),
@@ -614,50 +614,50 @@ public class McpServer
                     arguments?["fixIndex"]?.GetValue<int?>(),
                     arguments?["preview"]?.GetValue<bool>() ?? true),
 
-                "roslyn:get_project_structure" => await _roslynService.GetProjectStructureAsync(
+                "ulsm:get_project_structure" => await _roslynService.GetProjectStructureAsync(
                     arguments?["includeReferences"]?.GetValue<bool>() ?? true,
                     arguments?["includeDocuments"]?.GetValue<bool>() ?? false,
                     arguments?["projectNamePattern"]?.GetValue<string>(),
                     arguments?["maxProjects"]?.GetValue<int>(),
                     arguments?["summaryOnly"]?.GetValue<bool>() ?? false),
 
-                "roslyn:organize_usings" => await _roslynService.OrganizeUsingsAsync(
+                "ulsm:organize_usings" => await _roslynService.OrganizeUsingsAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required")),
 
-                "roslyn:organize_usings_batch" => await _roslynService.OrganizeUsingsBatchAsync(
+                "ulsm:organize_usings_batch" => await _roslynService.OrganizeUsingsBatchAsync(
                     arguments?["projectName"]?.GetValue<string>(),
                     arguments?["filePattern"]?.GetValue<string>(),
                     arguments?["preview"]?.GetValue<bool>() ?? true),
 
-                "roslyn:format_document_batch" => await _roslynService.FormatDocumentBatchAsync(
+                "ulsm:format_document_batch" => await _roslynService.FormatDocumentBatchAsync(
                     arguments?["projectName"]?.GetValue<string>(),
                     arguments?["includeTests"]?.GetValue<bool>() ?? true,
                     arguments?["preview"]?.GetValue<bool>() ?? true),
 
-                "roslyn:get_method_overloads" => await _roslynService.GetMethodOverloadsAsync(
+                "ulsm:get_method_overloads" => await _roslynService.GetMethodOverloadsAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
                     arguments?["line"]?.GetValue<int>() ?? throw new Exception("line required"),
                     arguments?["column"]?.GetValue<int>() ?? throw new Exception("column required")),
 
-                "roslyn:get_containing_member" => await _roslynService.GetContainingMemberAsync(
+                "ulsm:get_containing_member" => await _roslynService.GetContainingMemberAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
                     arguments?["line"]?.GetValue<int>() ?? throw new Exception("line required"),
                     arguments?["column"]?.GetValue<int>() ?? throw new Exception("column required")),
 
-                "roslyn:find_callers" => await _roslynService.FindCallersAsync(
+                "ulsm:find_callers" => await _roslynService.FindCallersAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
                     arguments?["line"]?.GetValue<int>() ?? throw new Exception("line required"),
                     arguments?["column"]?.GetValue<int>() ?? throw new Exception("column required"),
                     arguments?["maxResults"]?.GetValue<int>()),
 
-                "roslyn:find_unused_code" => await _roslynService.FindUnusedCodeAsync(
+                "ulsm:find_unused_code" => await _roslynService.FindUnusedCodeAsync(
                     arguments?["projectName"]?.GetValue<string>(),
                     arguments?["includePrivate"]?.GetValue<bool>() ?? true,
                     arguments?["includeInternal"]?.GetValue<bool>() ?? false,
                     arguments?["symbolKindFilter"]?.GetValue<string>(),
                     arguments?["maxResults"]?.GetValue<int>()),
 
-                "roslyn:rename_symbol" => await _roslynService.RenameSymbolAsync(
+                "ulsm:rename_symbol" => await _roslynService.RenameSymbolAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
                     arguments?["line"]?.GetValue<int>() ?? throw new Exception("line required"),
                     arguments?["column"]?.GetValue<int>() ?? throw new Exception("column required"),
@@ -666,14 +666,14 @@ public class McpServer
                     arguments?["maxFiles"]?.GetValue<int>(),
                     arguments?["verbosity"]?.GetValue<string>()),
 
-                "roslyn:extract_interface" => await _roslynService.ExtractInterfaceAsync(
+                "ulsm:extract_interface" => await _roslynService.ExtractInterfaceAsync(
                     arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
                     arguments?["line"]?.GetValue<int>() ?? throw new Exception("line required"),
                     arguments?["column"]?.GetValue<int>() ?? throw new Exception("column required"),
                     arguments?["interfaceName"]?.GetValue<string>() ?? throw new Exception("interfaceName required"),
                     arguments?["includeMemberNames"]?.AsArray()?.Select(n => n?.GetValue<string>() ?? "").Where(s => !string.IsNullOrEmpty(s)).ToList()),
 
-                "roslyn:dependency_graph" => await _roslynService.GetDependencyGraphAsync(
+                "ulsm:dependency_graph" => await _roslynService.GetDependencyGraphAsync(
                     arguments?["format"]?.GetValue<string>()),
 
                 _ => throw new Exception($"Unknown tool: {name}")
@@ -732,7 +732,7 @@ public class McpServer
 
     private async Task LogAsync(string level, string message)
     {
-        var logLevel = Environment.GetEnvironmentVariable("ROSLYN_LOG_LEVEL") ?? "Information";
+        var logLevel = Environment.GetEnvironmentVariable("ULSM_LOG_LEVEL") ?? "Information";
         if (ShouldLog(level, logLevel))
         {
             await Console.Error.WriteLineAsync($"[{DateTime.Now:HH:mm:ss}] [{level}] {message}");

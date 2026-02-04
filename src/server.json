@@ -1,18 +1,56 @@
 {
-  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/specification/main/schema/mcp.schema.json",
-  "mcpServers": {
-    "roslyn": {
-      "command": "dotnet-roslyn-mcp",
-      "args": [],
-      "env": {
-        "DOTNET_SOLUTION_PATH": "${workspaceFolder}",
-        "ROSLYN_LOG_LEVEL": "Information",
-        "ROSLYN_ENABLE_SEMANTIC_CACHE": "true",
-        "ROSLYN_MAX_DIAGNOSTICS": "100",
-        "ROSLYN_INCLUDE_HIDDEN_DIAGNOSTICS": "false",
-        "ROSLYN_PARALLEL_ANALYSIS": "true",
-        "ROSLYN_TIMEOUT_SECONDS": "30"
+  "name": "ulsm",
+  "displayName": "ULSM - Unity Language Server MCP",
+  "description": "Roslyn-based code analysis for Unity 6.x projects via Model Context Protocol",
+  "version": "1.0.0",
+  "author": "Prespective",
+  "license": "MIT",
+  "repository": "https://github.com/prespective/ulsm",
+  "tools": {
+    "prefix": "ulsm",
+    "categories": [
+      {
+        "name": "Navigation",
+        "tools": ["health_check", "load_solution", "get_symbol_info", "go_to_definition", "find_references", "find_implementations", "get_type_hierarchy"]
+      },
+      {
+        "name": "Search",
+        "tools": ["search_symbols", "semantic_query"]
+      },
+      {
+        "name": "Diagnostics",
+        "tools": ["get_diagnostics", "get_code_fixes", "apply_code_fix"]
+      },
+      {
+        "name": "Structure",
+        "tools": ["get_project_structure", "get_method_overloads", "get_containing_member", "dependency_graph"]
+      },
+      {
+        "name": "Refactoring",
+        "tools": ["organize_usings", "organize_usings_batch", "format_document_batch", "rename_symbol", "extract_interface"]
+      },
+      {
+        "name": "Analysis",
+        "tools": ["find_callers", "find_unused_code"]
       }
+    ]
+  },
+  "environment": {
+    "DOTNET_SOLUTION_PATH": {
+      "description": "Path to .sln file to auto-load on startup",
+      "required": false
+    },
+    "ULSM_LOG_LEVEL": {
+      "description": "Log level: Debug, Information, Warning, Error",
+      "default": "Information"
+    },
+    "ULSM_MAX_DIAGNOSTICS": {
+      "description": "Maximum diagnostics to return per request",
+      "default": "100"
+    },
+    "ULSM_TIMEOUT_SECONDS": {
+      "description": "Timeout for analysis operations",
+      "default": "30"
     }
   }
 }

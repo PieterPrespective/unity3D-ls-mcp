@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.FindSymbols;
 using Microsoft.CodeAnalysis.MSBuild;
 
-namespace RoslynMcp;
+namespace ULSM;
 
 public class RoslynService
 {
@@ -20,9 +20,9 @@ public class RoslynService
 
     public RoslynService()
     {
-        _maxDiagnostics = int.TryParse(Environment.GetEnvironmentVariable("ROSLYN_MAX_DIAGNOSTICS"), out var maxDiag)
+        _maxDiagnostics = int.TryParse(Environment.GetEnvironmentVariable("ULSM_MAX_DIAGNOSTICS"), out var maxDiag)
             ? maxDiag : 100;
-        _timeoutSeconds = int.TryParse(Environment.GetEnvironmentVariable("ROSLYN_TIMEOUT_SECONDS"), out var timeout)
+        _timeoutSeconds = int.TryParse(Environment.GetEnvironmentVariable("ULSM_TIMEOUT_SECONDS"), out var timeout)
             ? timeout : 30;
     }
 
@@ -56,7 +56,7 @@ public class RoslynService
         _workspace = MSBuildWorkspace.Create();
         _workspace.WorkspaceFailed += (sender, args) =>
         {
-            Console.Error.WriteLine($"[Warning] Workspace: {args.Diagnostic.Message}");
+            Console.Error.WriteLine($"[ULSM Warning] Workspace: {args.Diagnostic.Message}");
         };
 
         _solution = await _workspace.OpenSolutionAsync(solutionPath);
@@ -81,7 +81,7 @@ public class RoslynService
             return new
             {
                 status = "Not Ready",
-                message = "No solution loaded. Call roslyn:load_solution first or set DOTNET_SOLUTION_PATH environment variable.",
+                message = "No solution loaded. Call ulsm:load_solution first or set DOTNET_SOLUTION_PATH environment variable.",
                 solution = (object?)null,
                 workspace = (object?)null
             };
@@ -115,7 +115,7 @@ public class RoslynService
         return new
         {
             status = "Ready",
-            message = "Roslyn MCP Server is operational",
+            message = "ULSM (Unity Language Server MCP) is operational",
             solution = new
             {
                 loaded = true,
@@ -143,7 +143,7 @@ public class RoslynService
             {
                 maxDiagnostics = _maxDiagnostics,
                 timeoutSeconds = _timeoutSeconds,
-                semanticCacheEnabled = Environment.GetEnvironmentVariable("ROSLYN_ENABLE_SEMANTIC_CACHE") != "false"
+                semanticCacheEnabled = Environment.GetEnvironmentVariable("ULSM_ENABLE_SEMANTIC_CACHE") != "false"
             }
         };
     }
@@ -345,7 +345,7 @@ public class RoslynService
                 endLine = defLineSpan.EndLinePosition.Line,
                 endColumn = defLineSpan.EndLinePosition.Character
             },
-            hint = "This is the definition location. Use roslyn:find_references to see all usages."
+            hint = "This is the definition location. Use ulsm:find_references to see all usages."
         };
     }
 
@@ -763,7 +763,7 @@ public class RoslynService
                 diagnosticsNearby = diagnosticsAtPosition,
                 hint = diagnosticsAtPosition.Count > 0
                     ? $"Found {diagnosticsAtPosition.Count} other diagnostic(s) near this position. Try using one of their IDs."
-                    : "No diagnostics found at this position. Run roslyn:get_diagnostics to see all available diagnostics."
+                    : "No diagnostics found at this position. Run ulsm:get_diagnostics to see all available diagnostics."
             };
         }
 
@@ -858,7 +858,7 @@ public class RoslynService
             return new
             {
                 error = $"No diagnostic with ID '{diagnosticId}' found at line {line}, column {column}",
-                hint = "Run roslyn:get_code_fixes first to verify the diagnostic exists at this location."
+                hint = "Run ulsm:get_code_fixes first to verify the diagnostic exists at this location."
             };
         }
 
@@ -871,7 +871,7 @@ public class RoslynService
             {
                 error = $"No code fixes available for diagnostic '{diagnosticId}'",
                 diagnosticMessage = diagnostic.GetMessage(),
-                hint = "This diagnostic may not have automated code fixes available. Try the suggestions from roslyn:get_code_fixes.",
+                hint = "This diagnostic may not have automated code fixes available. Try the suggestions from ulsm:get_code_fixes.",
                 suggestedFixes = GetCommonFixSuggestions(diagnosticId, diagnostic.GetMessage())
             };
         }
@@ -2324,7 +2324,7 @@ public class RoslynService
     {
         if (_solution == null)
         {
-            throw new Exception("No solution loaded. Call roslyn:load_solution first or set DOTNET_SOLUTION_PATH environment variable.");
+            throw new Exception("No solution loaded. Call ulsm:load_solution first or set DOTNET_SOLUTION_PATH environment variable.");
         }
     }
 
@@ -2344,7 +2344,7 @@ public class RoslynService
             throw new FileNotFoundException($"Document not found in solution: {filePath}");
 
         // Cache it
-        var enableCache = Environment.GetEnvironmentVariable("ROSLYN_ENABLE_SEMANTIC_CACHE") != "false";
+        var enableCache = Environment.GetEnvironmentVariable("ULSM_ENABLE_SEMANTIC_CACHE") != "false";
         if (enableCache)
         {
             _documentCache[filePath] = document;
