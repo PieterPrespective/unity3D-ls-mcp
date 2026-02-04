@@ -114,6 +114,13 @@ ULSM is a fork of [dotnet-roslyn-mcp](https://github.com/brendankowitz/dotnet-ro
 Unity-specific enhancements by Prespective.
 
 
+<a name="1.0.1"></a>
+## [1.0.1](https://www.github.com/PieterPrespective/unity3D-ls-mcp/releases/tag/v1.0.1) (2026-02-04)
+
+### Bug Fixes
+
+* improve MSBuild detection for packaged tool installation ([bd79800](https://www.github.com/PieterPrespective/unity3D-ls-mcp/commit/bd798002d07ec2997c6484755ef8841f5803db1b))
+
 <a name="1.0.0"></a>
 ## [1.0.0](https://www.github.com/PieterPrespective/unity3D-ls-mcp/releases/tag/v1.0.0) (2026-02-04)
 
