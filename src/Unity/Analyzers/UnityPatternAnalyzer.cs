@@ -159,11 +159,18 @@ public class UnityPatternAnalyzer
             // Handle different invocation patterns
             if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
             {
+                // Handle: obj.Method() or obj.Method<T>()
                 methodName = memberAccess.Name.Identifier.Text;
             }
             else if (invocation.Expression is IdentifierNameSyntax identifier)
             {
+                // Handle: Method()
                 methodName = identifier.Identifier.Text;
+            }
+            else if (invocation.Expression is GenericNameSyntax genericName)
+            {
+                // Handle: Method<T>() - generic method calls without receiver
+                methodName = genericName.Identifier.Text;
             }
 
             if (methodName != null && ExpensiveMethodPatterns.TryGetValue(methodName, out var suggestion))
