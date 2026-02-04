@@ -33,6 +33,9 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.9.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.Features" Version="4.9.2" />
     <PackageReference Include="Microsoft.Build.Locator" Version="1.6.10" />
+
+    <!-- Unity Analyzers -->
+    <PackageReference Include="Microsoft.Unity.Analyzers" Version="1.19.0" />
   </ItemGroup>
 
   <ItemGroup>
