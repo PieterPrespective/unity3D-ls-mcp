@@ -32,6 +32,11 @@
       {
         "name": "Analysis",
         "tools": ["find_callers", "find_unused_code"]
+      },
+      {
+        "name": "Unity Analysis",
+        "description": "Unity-specific code analysis using Microsoft.Unity.Analyzers and custom pattern detection",
+        "tools": ["unity_diagnostics", "check_unity_patterns", "api_migration", "list_unity_rules"]
       }
     ]
   },

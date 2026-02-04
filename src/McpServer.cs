@@ -1,16 +1,19 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using ULSM.Unity;
 
 namespace ULSM;
 
 public class McpServer
 {
     private readonly RoslynService _roslynService;
+    private readonly UnityAnalysisService _unityAnalysisService;
     private readonly JsonSerializerOptions _jsonOptions;
 
     public McpServer()
     {
         _roslynService = new RoslynService();
+        _unityAnalysisService = new UnityAnalysisService(_roslynService);
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -521,6 +524,66 @@ public class McpServer
                         format = new { type = "string", description = "Output format: 'json' (default) returns structured data, 'mermaid' returns Mermaid diagram syntax" }
                     }
                 }
+            },
+            // Unity Analysis Tools
+            (object)new
+            {
+                name = "ulsm:unity_diagnostics",
+                description = "Get Unity-specific diagnostics using Microsoft.Unity.Analyzers. Detects Unity anti-patterns like null coalescing on Unity objects, inefficient tag comparison, empty Unity messages, and more. Requires a Unity project to be loaded.",
+                inputSchema = new
+                {
+                    type = "object",
+                    properties = new
+                    {
+                        filePath = new { type = "string", description = "Optional: analyze specific file only" },
+                        projectPath = new { type = "string", description = "Optional: analyze specific project only" },
+                        category = new { type = "string", description = "Optional: filter by category - 'messages', 'nullchecking', 'performance', or 'bestpractices'" },
+                        includeSuppressions = new { type = "boolean", description = "Include suppressed diagnostics (default: false)" },
+                        maxResults = new { type = "integer", description = "Maximum diagnostics to return (default: 100)" }
+                    }
+                }
+            },
+            (object)new
+            {
+                name = "ulsm:check_unity_patterns",
+                description = "Check for Unity performance anti-patterns beyond standard analyzers. Detects GetComponent in Update loops, string concatenation in hot paths, Camera.main usage, Debug.Log in release code, and more. Provides specific suggestions for each issue.",
+                inputSchema = new
+                {
+                    type = "object",
+                    properties = new
+                    {
+                        filePath = new { type = "string", description = "File to analyze (required)" },
+                        includeInfo = new { type = "boolean", description = "Include informational (low severity) patterns (default: true)" },
+                        checkHotPathsOnly = new { type = "boolean", description = "Only check patterns in Update/FixedUpdate/LateUpdate (default: false)" }
+                    },
+                    required = new[] { "filePath" }
+                }
+            },
+            (object)new
+            {
+                name = "ulsm:api_migration",
+                description = "Check for deprecated Unity API usage that should be migrated. Covers Unity 2022.x to Unity 6.x (6000.x) transitions including Input System, Networking (UNet removal), XR, and more. Returns migration suggestions with new API equivalents.",
+                inputSchema = new
+                {
+                    type = "object",
+                    properties = new
+                    {
+                        filePath = new { type = "string", description = "Optional: check specific file only" },
+                        projectPath = new { type = "string", description = "Optional: check specific project only" },
+                        targetVersion = new { type = "string", description = "Unity version to check migrations for (default: '6000.0')" },
+                        categoryFilter = new { type = "string", description = "Optional: filter by category - 'Input', 'Networking', 'Rendering', 'XR', etc." }
+                    }
+                }
+            },
+            (object)new
+            {
+                name = "ulsm:list_unity_rules",
+                description = "List all available Unity diagnostic rules and migration patterns. Useful for understanding what the Unity analyzers can detect.",
+                inputSchema = new
+                {
+                    type = "object",
+                    properties = new { }
+                }
             }
         };
 
@@ -675,6 +738,27 @@ public class McpServer
 
                 "ulsm:dependency_graph" => await _roslynService.GetDependencyGraphAsync(
                     arguments?["format"]?.GetValue<string>()),
+
+                // Unity Analysis Tools
+                "ulsm:unity_diagnostics" => await _unityAnalysisService.GetUnityDiagnosticsAsync(
+                    arguments?["filePath"]?.GetValue<string>(),
+                    arguments?["projectPath"]?.GetValue<string>(),
+                    arguments?["category"]?.GetValue<string>(),
+                    arguments?["includeSuppressions"]?.GetValue<bool>() ?? false,
+                    arguments?["maxResults"]?.GetValue<int>() ?? 100),
+
+                "ulsm:check_unity_patterns" => await _unityAnalysisService.CheckUnityPatternsAsync(
+                    arguments?["filePath"]?.GetValue<string>() ?? throw new Exception("filePath required"),
+                    arguments?["includeInfo"]?.GetValue<bool>() ?? true,
+                    arguments?["checkHotPathsOnly"]?.GetValue<bool>() ?? false),
+
+                "ulsm:api_migration" => await _unityAnalysisService.CheckApiMigrationAsync(
+                    arguments?["filePath"]?.GetValue<string>(),
+                    arguments?["projectPath"]?.GetValue<string>(),
+                    arguments?["targetVersion"]?.GetValue<string>() ?? "6000.0",
+                    arguments?["categoryFilter"]?.GetValue<string>()),
+
+                "ulsm:list_unity_rules" => _unityAnalysisService.GetAvailableDiagnostics(),
 
                 _ => throw new Exception($"Unknown tool: {name}")
             };
