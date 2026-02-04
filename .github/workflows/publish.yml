@@ -1,17 +1,17 @@
-name: Publish to NuGet
+name: Publish to NuGet (Manual)
 
 on:
-  push:
-    branches:
-      - main
-  release:
-    types: [published]
   workflow_dispatch:
     inputs:
       version:
-        description: 'Package version (leave empty to use GitVersion)'
-        required: false
+        description: 'Package version (e.g., 1.0.0)'
+        required: true
         type: string
+      prerelease:
+        description: 'Is this a prerelease?'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   publish:
@@ -21,41 +21,24 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Required for GitVersion
+        fetch-depth: 0
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
 
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v1
-      with:
-        versionSpec: '6.0.x'
-
-    - name: Determine Version
-      id: gitversion
-      uses: gittools/actions/gitversion/execute@v1
-      with:
-        useConfigFile: true
-
-    - name: Set version
-      id: version
-      run: |
-        if [ -n "${{ inputs.version }}" ]; then
-          echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
-        else
-          echo "version=${{ steps.gitversion.outputs.semVer }}" >> $GITHUB_OUTPUT
-        fi
-
     - name: Restore dependencies
-      run: dotnet restore RoslynMcp.sln
+      run: dotnet restore ULSM.sln
 
     - name: Build
-      run: dotnet build RoslynMcp.sln --configuration Release --no-restore /p:Version=${{ steps.version.outputs.version }}
+      run: dotnet build ULSM.sln --configuration Release --no-restore /p:Version=${{ inputs.version }}
+
+    - name: Test
+      run: dotnet test ULSM.sln --configuration Release --no-build --verbosity normal
 
     - name: Pack
-      run: dotnet pack src/RoslynMcp.csproj --configuration Release --no-build /p:Version=${{ steps.version.outputs.version }} --output ./artifacts
+      run: dotnet pack src/ULSM.csproj --configuration Release --no-build /p:Version=${{ inputs.version }} --output ./artifacts
 
     - name: Publish to NuGet
       run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
@@ -63,12 +46,11 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: nuget-package-release
+        name: nuget-package-${{ inputs.version }}
         path: ./artifacts/*.nupkg
         retention-days: 90
 
     - name: Display publish info
       run: |
-        echo "Published Version: ${{ steps.version.outputs.version }}"
-        echo "Package: RoslynMcp"
+        echo "Published ULSM v${{ inputs.version }} to NuGet"
         ls -lh ./artifacts/

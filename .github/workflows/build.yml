@@ -26,36 +26,24 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Required for GitVersion
+        fetch-depth: 0
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ inputs.dotnet-version || '8.0.x' }}
 
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v1
-      with:
-        versionSpec: '6.0.x'
-
-    - name: Determine Version
-      id: gitversion
-      uses: gittools/actions/gitversion/execute@v1
-      with:
-        useConfigFile: true
-
     - name: Restore dependencies
-      run: dotnet restore RoslynMcp.sln
+      run: dotnet restore ULSM.sln
 
     - name: Build
-      run: dotnet build RoslynMcp.sln --configuration ${{ inputs.configuration || 'Release' }} --no-restore /p:Version=${{ steps.gitversion.outputs.semVer }}
+      run: dotnet build ULSM.sln --configuration ${{ inputs.configuration || 'Release' }} --no-restore
 
     - name: Test
-      run: dotnet test RoslynMcp.sln --configuration ${{ inputs.configuration || 'Release' }} --no-build --verbosity normal
-      continue-on-error: true  # Continue even if no tests found
+      run: dotnet test ULSM.sln --configuration ${{ inputs.configuration || 'Release' }} --no-build --verbosity normal
 
     - name: Pack
-      run: dotnet pack src/RoslynMcp.csproj --configuration ${{ inputs.configuration || 'Release' }} --no-build /p:Version=${{ steps.gitversion.outputs.semVer }} --output ./artifacts
+      run: dotnet pack src/ULSM.csproj --configuration ${{ inputs.configuration || 'Release' }} --no-build --output ./artifacts
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
@@ -66,6 +54,5 @@ jobs:
 
     - name: Display package info
       run: |
-        echo "Package Version: ${{ steps.gitversion.outputs.semVer }}"
-        echo "Informational Version: ${{ steps.gitversion.outputs.informationalVersion }}"
+        echo "Package built successfully"
         ls -lh ./artifacts/

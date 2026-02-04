@@ -1,0 +1,124 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags created by versionize (v1.0.0, v1.1.0, etc.)
+
+permissions:
+  contents: write  # Required to create releases
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Get version from tag
+      id: version
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION"
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore ULSM.sln
+
+    - name: Build
+      run: dotnet build ULSM.sln --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test ULSM.sln --configuration Release --no-build --verbosity normal
+
+    - name: Pack
+      run: dotnet pack src/ULSM.csproj --configuration Release --no-build --output ./artifacts
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-package-${{ steps.version.outputs.version }}
+        path: ./artifacts/*.nupkg
+        retention-days: 90
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: nuget-package-${{ needs.build.outputs.version }}
+        path: ./artifacts
+
+    - name: Extract changelog for this version
+      id: changelog
+      run: |
+        # Extract the changelog section for this version
+        VERSION=${{ needs.build.outputs.version }}
+
+        # Get changelog content between this version and the next version header
+        # This is a simplified extraction - adjust based on your CHANGELOG format
+        CHANGELOG_CONTENT=$(sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '$d' || echo "Release v$VERSION")
+
+        # If no specific changelog found, use a default message
+        if [ -z "$CHANGELOG_CONTENT" ]; then
+          CHANGELOG_CONTENT="Release v$VERSION of ULSM - Unity Language Server MCP"
+        fi
+
+        # Write to file for the release body
+        echo "$CHANGELOG_CONTENT" > release_notes.md
+        echo "Changelog extracted for v$VERSION"
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: ULSM v${{ needs.build.outputs.version }}
+        body_path: release_notes.md
+        files: ./artifacts/*.nupkg
+        draft: false
+        prerelease: ${{ contains(needs.build.outputs.version, '-') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-nuget:
+    needs: [build, release]
+    runs-on: ubuntu-latest
+    if: ${{ !contains(needs.build.outputs.version, '-') }}  # Only publish stable releases to NuGet
+
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: nuget-package-${{ needs.build.outputs.version }}
+        path: ./artifacts
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Publish to NuGet
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      continue-on-error: true  # Don't fail if package already exists
+
+    - name: Display publish info
+      run: |
+        echo "Published ULSM v${{ needs.build.outputs.version }} to NuGet"
+        ls -lh ./artifacts/
