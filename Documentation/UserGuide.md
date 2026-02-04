@@ -78,6 +78,24 @@ claude mcp add --transport stdio ulsm \
 | `ULSM_MAX_DIAGNOSTICS` | No | Maximum diagnostics to return per request |
 | `UNITY_EDITOR_PATH` | No | Path to Unity Editor for reference resolution |
 
+### Path Resolution for DOTNET_SOLUTION_PATH
+
+The solution path supports multiple formats:
+
+| Format | Example | Resolution |
+|--------|---------|------------|
+| Absolute | `C:/Projects/MyGame/MyGame.sln` | Used as-is |
+| Variable | `${workspaceFolder}/MyGame.sln` | Expanded by MCP client before passing to ULSM |
+| Relative | `./MyGame.sln` | Resolved against the MCP server's working directory |
+
+**Recommendation:** Use `${workspaceFolder}` for portable configuration that works across different machines:
+
+```json
+"DOTNET_SOLUTION_PATH": "${workspaceFolder}/MyGame.sln"
+```
+
+Relative paths work but depend on the working directory when the MCP server starts, which may vary.
+
 ### Configuration File
 
 **.claude/mcp-spec.json** (in your project root):
@@ -281,8 +299,9 @@ Find dead code in your project.
 ### "Unity project not detected"
 
 1. Ensure `.sln` and `.csproj` files exist (regenerate in Unity if needed)
-2. Use absolute path in `DOTNET_SOLUTION_PATH`
+2. Use `${workspaceFolder}/YourProject.sln` or an absolute path in `DOTNET_SOLUTION_PATH` for reliable resolution
 3. Check that `Assets/` and `ProjectSettings/` folders exist
+4. If using relative paths, verify they resolve correctly from the MCP server's working directory
 
 ### "Missing type references" (CS0012 errors)
 

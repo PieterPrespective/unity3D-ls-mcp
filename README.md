@@ -86,6 +86,28 @@ claude mcp add --transport stdio ulsm \
 | `ULSM_FORCE_ADHOC` | false | Force AdhocWorkspace instead of MSBuildWorkspace |
 | `UNITY_EDITOR_PATH` | (Auto-detect) | Path to Unity Editor installation for reference resolution |
 
+### Path Resolution
+
+`DOTNET_SOLUTION_PATH` supports three path formats:
+
+| Format | Example | Notes |
+|--------|---------|-------|
+| Absolute | `C:/Projects/MyGame/MyGame.sln` | Always works reliably |
+| Variable | `${workspaceFolder}/MyGame.sln` | Expanded by MCP client (recommended for portability) |
+| Relative | `./MyGame.sln` | Resolved against process working directory |
+
+**Recommended:** Use `${workspaceFolder}` in configuration files for portable, reliable path resolution:
+
+```json
+{
+  "env": {
+    "DOTNET_SOLUTION_PATH": "${workspaceFolder}/MyGame.sln"
+  }
+}
+```
+
+Relative paths (e.g., `./MyGame.sln`) work but are resolved against the MCP server's working directory, which may vary depending on how the server is launched.
+
 ### Framework Path Locations
 
 ULSM automatically searches for .NET Framework 4.7.1 reference assemblies:
@@ -281,7 +303,7 @@ If these paths don't exist on your system, set `ULSM_FRAMEWORK_PATH` manually or
 
 2. **Missing folder structure**: ULSM looks for `Assets/` and `ProjectSettings/` folders
 
-3. **Relative solution path**: Use absolute paths in `DOTNET_SOLUTION_PATH`
+3. **Path resolution issues**: If using relative paths, ensure they resolve correctly. Use `${workspaceFolder}/YourProject.sln` for reliable resolution, or use absolute paths
 
 ### Framework Reference Errors
 
