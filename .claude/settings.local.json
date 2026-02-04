@@ -1,0 +1,106 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__pskd__GetServerVersion",
+      "mcp__pskd__ListCollections",
+      "mcp__pskd__DoltStatus",
+      "mcp__pskd__CreateCollection",
+      "mcp__pskd__AddDocuments",
+      "mcp__pskd__QueryDocuments",
+      "mcp__pskd__GetDocuments",
+      "mcp__pskd__UpdateDocuments",
+      "mcp__pskd__DeleteDocuments",
+      "mcp__pskd__GetCollectionCount",
+      "mcp__pskd__GetCollectionInfo",
+      "mcp__pskd__PeekCollection",
+      "mcp__pskd__DoltCommit",
+      "mcp__pskd__DoltBranches",
+      "mcp__psdd__GetServerVersion",
+      "mcp__psdd__ListCollections",
+      "mcp__psdd__DoltStatus",
+      "mcp__psdd__CreateCollection",
+      "mcp__psdd__AddDocuments",
+      "mcp__psdd__QueryDocuments",
+      "mcp__psdd__GetDocuments",
+      "mcp__psdd__UpdateDocuments",
+      "mcp__psdd__DeleteDocuments",
+      "mcp__psdd__GetCollectionCount",
+      "mcp__psdd__GetCollectionInfo",
+      "mcp__psdd__PeekCollection",
+      "mcp__psdd__DoltCommit",
+      "mcp__psdd__DoltBranches",
+      "mcp__psdd__DoltPush",
+      "mcp__psdd__DoltClone",
+      "mcp__psdd__DoltReset",
+      "mcp__psdd__DeleteCollection",
+      "mcp__psdd__DoltInit",
+      "mcp__psdd__PreviewImport",
+      "mcp__psdd__ExecuteImport",
+      "mcp__pskd__PreviewImport",
+      "mcp__pskd__ExecuteImport",
+      "mcp__pskd__DeleteCollection",
+      "mcp__psdd__DoltCheckout",
+      "mcp__pskd__DoltCheckout",
+      "mcp__unityMCP__refresh_unity",
+      "mcp__unityMCP__read_console",
+      "mcp__unityMCP__run_tests",
+      "mcp__unityMCP__get_test_job",
+      "Skill(knowledge)",
+      "Skill(devdiary)",
+      "mcp__unityMCP__manage_scene",
+      "mcp__unityMCP__manage_asset",
+      "mcp__unityMCP__manage_components",
+      "mcp__unityMCP__manage_editor",
+      "Bash(timeout /t 2 /nobreak)",
+      "mcp__pskd__DoltPush",
+      "WebSearch"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "pskd",
+    "psdd"
+  ],
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "mcp__pskd__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/log-pskd-action.js"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__psdd__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/log-psdd-action.js"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "mcp__pskd__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/validate-pskd-action.js"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__psdd__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/validate-psdd-action.js"
+          }
+        ]
+      }
+    ]
+  }
+}

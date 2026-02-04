@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "pskd": {
+      "command": "./Embranch/Embranch.exe",
+      "env": {
+        "EMBRANCH_DATA_PATH": "./mcpdata/PSKD",
+        "EMBRANCH_PROJECT_ROOT": "./mcpdata/PSKD",
+        "CHROMA_DATA_PATH": "./mcpdata/PSKD/dev/chroma",
+        "DOLT_REPOSITORY_PATH": "./mcpdata/PSKD/dev/dolt-repo",
+        "DOLT_EXECUTABLE_PATH": "C:\\Program Files\\Dolt\\bin\\dolt.exe",
+        "ENABLE_LOGGING": "True",
+        "LOG_LEVEL": "Debug",
+        "LOG_FILE_NAME": "./mcpdata/PSKD/logs/embranch.log"
+      }
+    },
+    "psdd": {
+      "command": "./Embranch/Embranch.exe",
+      "env": {
+        "EMBRANCH_DATA_PATH": "./mcpdata/PSDD",
+        "EMBRANCH_PROJECT_ROOT": "./mcpdata/PSDD",
+        "CHROMA_DATA_PATH": "./mcpdata/PSDD/dev/chroma",
+        "DOLT_REPOSITORY_PATH": "./mcpdata/PSDD/dev/dolt-repo",
+        "DOLT_EXECUTABLE_PATH": "C:\\Program Files\\Dolt\\bin\\dolt.exe",
+        "ENABLE_LOGGING": "True",
+        "LOG_LEVEL": "Debug",
+        "LOG_FILE_NAME": "./mcpdata/PSDD/logs/embranch.log"
+      }
+    }
+  }
+}

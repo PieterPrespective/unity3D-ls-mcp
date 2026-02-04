@@ -3,6 +3,33 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Ignore mcpdata contents (databases, logs, etc.)
+mcpdata/*
+!mcpdata/PSKD/
+mcpdata/PSKD/*
+!mcpdata/PSKD/.dmms/
+mcpdata/PSKD/.dmms/*
+!mcpdata/PSKD/.dmms/state.json
+!mcpdata/PSDD/
+mcpdata/PSDD/*
+!mcpdata/PSDD/.dmms/
+mcpdata/PSDD/.dmms/*
+!mcpdata/PSDD/.dmms/state.json
+
+# Ignore contents of examples folder (temp for local development only)
+Examples/*
+
+
+# Windows reserved device names (created accidentally)
+nul
+
+# Log files
+dev-diary-agent-log.txt
+prespective-knowledge-agent-log.txt
+
+# Claude Code temp files
+tmpclaude-*-cwd
+
 # User-specific files
 *.rsuser
 *.suo
