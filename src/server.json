@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "author": "Prespective",
   "license": "MIT",
-  "repository": "https://github.com/prespective/ulsm",
+  "repository": "https://github.com/PieterPrespective/unity3D-ls-mcp",
   "tools": {
     "prefix": "ulsm",
     "categories": [
