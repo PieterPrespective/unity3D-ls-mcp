@@ -29,8 +29,19 @@ public class McpServer
         var solutionPath = Environment.GetEnvironmentVariable("DOTNET_SOLUTION_PATH");
         if (!string.IsNullOrEmpty(solutionPath))
         {
+            var originalPath = solutionPath;
+            await LogAsync("Information", $"DOTNET_SOLUTION_PATH set to: {solutionPath}");
+
             try
             {
+                // Resolve relative paths against current directory
+                if (!Path.IsPathRooted(solutionPath))
+                {
+                    var currentDir = Environment.CurrentDirectory;
+                    solutionPath = Path.GetFullPath(Path.Combine(currentDir, solutionPath));
+                    await LogAsync("Information", $"Resolved relative path to: {solutionPath}");
+                }
+
                 // If it's a directory, try to find a .sln file
                 if (Directory.Exists(solutionPath))
                 {
@@ -38,6 +49,11 @@ public class McpServer
                     if (slnFiles.Length > 0)
                     {
                         solutionPath = slnFiles[0];
+                        await LogAsync("Information", $"Found solution in directory: {solutionPath}");
+                    }
+                    else
+                    {
+                        await LogAsync("Warning", $"Directory exists but contains no .sln files: {solutionPath}");
                     }
                 }
 
@@ -45,12 +61,23 @@ public class McpServer
                 {
                     await LogAsync("Information", $"Auto-loading solution: {solutionPath}");
                     await _roslynService.LoadSolutionAsync(solutionPath);
+                    await LogAsync("Information", "Solution auto-loaded successfully");
+                }
+                else
+                {
+                    await LogAsync("Warning", $"Solution file not found: {solutionPath}");
+                    await LogAsync("Warning", $"Original DOTNET_SOLUTION_PATH was: {originalPath}");
+                    await LogAsync("Warning", $"Current working directory: {Environment.CurrentDirectory}");
                 }
             }
             catch (Exception ex)
             {
                 await LogAsync("Warning", $"Failed to auto-load solution: {ex.Message}");
             }
+        }
+        else
+        {
+            await LogAsync("Information", "DOTNET_SOLUTION_PATH not set, waiting for ulsm:load_solution call");
         }
 
         // Main event loop - read from stdin, write to stdout

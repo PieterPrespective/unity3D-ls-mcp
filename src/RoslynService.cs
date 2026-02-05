@@ -22,6 +22,7 @@ public class RoslynService
     private bool _isUnityProject;
     private string? _unityVersion;
     private bool _usedFallbackWorkspace;
+    private string? _solutionPath; // Store original path passed to LoadSolutionAsync
 
     public RoslynService()
     {
@@ -67,6 +68,9 @@ public class RoslynService
         {
             throw new FileNotFoundException($"Solution file not found: {solutionPath}");
         }
+
+        // Store original path for response (AdhocWorkspace solutions don't have FilePath set)
+        _solutionPath = solutionPath;
 
         // Dispose existing workspaces
         _workspace?.Dispose();
@@ -133,7 +137,7 @@ public class RoslynService
         return new
         {
             success = true,
-            solutionPath = _solution.FilePath,
+            solutionPath = _solutionPath ?? _solution.FilePath,
             projectCount,
             documentCount,
             isUnityProject = _isUnityProject,
@@ -145,7 +149,8 @@ public class RoslynService
 
     public async Task<object> GetHealthCheckAsync()
     {
-        if (_solution == null || _workspace == null)
+        // Only check _solution - workspace type (MSBuild vs Adhoc) is irrelevant for ready state
+        if (_solution == null)
         {
             return new
             {
@@ -181,6 +186,10 @@ public class RoslynService
         var projectCount = _solution.ProjectIds.Count;
         var documentCount = _solution.Projects.Sum(p => p.DocumentIds.Count);
 
+        // Determine workspace type for diagnostics
+        var workspaceType = _workspace != null ? "MSBuildWorkspace" :
+                            _workspaceBase != null ? "AdhocWorkspace" : "Unknown";
+
         return new
         {
             status = "Ready",
@@ -188,7 +197,7 @@ public class RoslynService
             solution = new
             {
                 loaded = true,
-                path = _solution.FilePath,
+                path = _solutionPath ?? _solution.FilePath,
                 projects = projectCount,
                 documents = documentCount,
                 loadedAt = _solutionLoadedAt?.ToString("yyyy-MM-ddTHH:mm:ssZ"),
@@ -199,6 +208,7 @@ public class RoslynService
             },
             workspace = new
             {
+                type = workspaceType,
                 indexed = true,
                 cacheSize = _documentCache.Count,
                 usedFallback = _usedFallbackWorkspace,
