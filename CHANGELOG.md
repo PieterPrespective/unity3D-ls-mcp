@@ -114,6 +114,13 @@ ULSM is a fork of [dotnet-roslyn-mcp](https://github.com/brendankowitz/dotnet-ro
 Unity-specific enhancements by Prespective.
 
 
+<a name="1.0.2"></a>
+## [1.0.2](https://www.github.com/PieterPrespective/unity3D-ls-mcp/releases/tag/v1.0.2) (2026-02-05)
+
+### Documentation
+
+* add PP13-108 assignment prompt for state management fixes ([e391fc8](https://www.github.com/PieterPrespective/unity3D-ls-mcp/commit/e391fc849feead912b6a00cddc9a4ec5668caf91))
+
 <a name="1.0.1"></a>
 ## [1.0.1](https://www.github.com/PieterPrespective/unity3D-ls-mcp/releases/tag/v1.0.1) (2026-02-04)
 
